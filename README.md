@@ -39,8 +39,6 @@ Successful firmware update indicated by 5 blinks of onboard LED, failure — wi
 Mode is indicated by onboard LED, e.g. if you need HTTP server, wait for 3 LED flashes in a row and release ''Reset'' button.
 
 (c) Dmitriy Zherebkov, dzh@black-swift.com
-==========
-
 
 U-Boot 1.1.4 modification for routers
 ==========
