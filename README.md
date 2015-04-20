@@ -3,7 +3,7 @@ U-Boot modification for Black Swift Board
 
 This is a modified U-Boot boot loader for Black Swift board (http://www.black-swift.com)
 
-- Black Swift support (compile with 'make bsb' command)
+- Black Swift support (compile with *make bsb* command)
 - Support for board firmware upgrade with USB flash drive: any specific partition (u-boot, u-boot-env, firmware, art) or the whole flash (16 MB)
 - Support for running U-Boot scripts from USB flash drive
 
@@ -14,29 +14,29 @@ Following source were used:
 
 To prepare USB flash drive:
 - Format USB drive into FAT or FAT32 filesystem
-- Place one of the following files on it in '_BSB' folder:
-	- autorun: U-Boot console commands to execute
-	- u-boot.bin: u-boot partition image (U-Boot itself, 128KB).
-	- u-boot-env.bin: u-boot-env partition image (U-Boot environment variables, 64KB).
-	- firmware.bin: OpenWRT firmware partition image (size may vary).
-	- art.bin: ART partition image (64KB).
-	- dump.bin: whole flash (16MB).
+- Place one of the following files on it in *_BSB* folder:
+	- **autorun**: U-Boot console commands to execute
+	- **u-boot.bin**: u-boot partition image (U-Boot itself, 128KB).
+	- **u-boot-env.bin**: u-boot-env partition image (U-Boot environment variables, 64KB).
+	- **firmware.bin**: OpenWRT firmware partition image (size may vary).
+	- **art.bin**: ART partition image (64KB).
+	- **dump.bin**: whole flash (16MB).
 - Turn Black Swift off
-- Connect USB drive to its 'Host' USB port
-- Press and hold 'Reset' button
+- Connect USB drive to its *Host* USB port
+- Press and hold *Reset* button
 - Turn Black Swift on
-- Wait for onboard LED to blink once and release 'Reset' button
+- Wait for onboard LED to blink once and release *Reset* button
 
 Successful firmware update indicated by 5 blinks of onboard LED, failure — with 20 fast blinks.
 
-'Reset' button may be used to access other special bootloader modes:
-- Mode 0: Press < 2 sec or > 10 sec: run OpenWRT with default (factory) settings
-- Mode 1: 2...4 sec: firmware upgrade with USB flash drive
-- Mode 2: 4...6 sec: enter U-Boot console
-- Mode 3: 6...8 sec: start U-Boot internal HTTP server
-- Mode 4: 8...10 sec: start U-Boot netconsole
+*Reset* button may be used to access other special bootloader modes:
+- **Mode 0**: Press < 2 sec or > 10 sec: run OpenWRT with default (factory) settings
+- **Mode 1**: 2...4 sec: firmware upgrade with USB flash drive
+- **Mode 2**: 4...6 sec: enter U-Boot console
+- **Mode 3**: 6...8 sec: start U-Boot internal HTTP server
+- **Mode 4**: 8...10 sec: start U-Boot netconsole
 
-Mode is indicated by onboard LED, e.g. if you need HTTP server, wait for 3 LED flashes in a row and release ''Reset'' button.
+Mode is indicated by onboard LED, e.g. if you need HTTP server, wait for 3 LED flashes in a row and release *Reset* button.
 
 (c) Dmitriy Zherebkov, dzh@black-swift.com
 
