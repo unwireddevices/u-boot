@@ -55,13 +55,13 @@ block_dev_desc_t *get_dev(const char *ifname, int dev)
 {
 	const struct block_drvr *drvr = block_drvr;
 	block_dev_desc_t* (*reloc_get_dev)(int dev);
-	char *name;
+	char *name=NULL;
 	if (!ifname)
 		return NULL;
-	name = drvr->name;
-#ifdef CONFIG_NEEDS_MANUAL_RELOC
-	name += gd->reloc_off;
-#endif
+
+	if(strncmp(ifname, "usb", 3) == 0)
+		return usb_stor_get_dev(dev);
+
 	while (drvr->name) {
 		name = drvr->name;
 		reloc_get_dev = drvr->get_dev;
