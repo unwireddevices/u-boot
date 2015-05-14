@@ -30,7 +30,7 @@ To prepare USB flash drive:
 Successful firmware update indicated by 5 blinks of onboard LED, failure — with 20 fast blinks.
 
 *Reset* button may be used to access other special bootloader modes:
-- **Mode 0**: Press < 2 sec or > 10 sec: run OpenWRT with default (factory) settings
+- **Mode 0**: Press < 2 sec or > 10 sec: run OpenWRT with default memory and CPU clock settings
 - **Mode 1**: 2...4 sec: firmware upgrade with USB flash drive
 - **Mode 2**: 4...6 sec: enter U-Boot console
 - **Mode 3**: 6...8 sec: start U-Boot internal HTTP server
