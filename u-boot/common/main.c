@@ -21,7 +21,7 @@
  * MA 02111-1307 USA
  */
 
-/* #define	DEBUG	*/
+//#define	DEBUG
 
 #include <common.h>
 #include <command.h>
@@ -426,6 +426,43 @@ static void blink_sys_led(int stage)
 
 /****************************************************************************/
 
+static void try_runonce(int stage)
+{
+	char* command=NULL;
+	char var[10];
+
+	sprintf(var,"runonce%d",stage);
+
+	command=getenv(var);
+
+	if(command)
+	{
+		char cmd_erase[40];
+		char cmd_run[200];
+
+		strcpy(cmd_run,command);
+
+		sprintf(cmd_erase,"setenv %s; saveenv; printenv",var);
+		bsb_run(cmd_erase);
+
+		bsb_run(cmd_run);
+	}
+}
+
+/****************************************************************************/
+
+static void try_autorun()
+{
+	char* command=getenv("autorun");
+
+	if(command)
+	{
+		bsb_run(command);
+	}
+}
+
+/****************************************************************************/
+
 void main_loop(void){
 #ifndef CFG_HUSH_PARSER
 	static char lastcommand[CFG_CBSIZE] = { 0, };
@@ -569,6 +606,12 @@ void main_loop(void){
 	}
 
 	if(bootdelay >= 0 && s && !abortboot(bootdelay)){
+
+		try_runonce(1);
+
+		try_autorun();
+
+		try_runonce(2);
 
 		// try to boot
 #ifndef CFG_HUSH_PARSER
@@ -916,7 +959,6 @@ int run_command(const char *cmd, int flag){
 	 * repeatable commands
 	 */
 	while(*str){
-
 		/*
 		 * Find separator, or string end
 		 * Allow simple escape of ';' by writing "\;"

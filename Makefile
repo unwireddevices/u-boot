@@ -163,6 +163,7 @@ bsb:	export UBOOT_FILE_NAME=uboot_for_bsb
 bsb:	export MAX_UBOOT_SIZE=128
 bsb:	export COMPRESSED_UBOOT=1
 bsb:	export DEVICE_VENDOR=SE
+bsb:	export DISABLE_CONSOLE_OUTPUT=1
 bsb:
 	@cd $(BUILD_TOPDIR)/u-boot/ && $(MAKECMD) bsb_config
 	@cd $(BUILD_TOPDIR)/u-boot/ && $(MAKECMD) ENDIANNESS=-EB V=1 all

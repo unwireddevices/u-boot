@@ -59,7 +59,8 @@
 
 #elif defined(CONFIG_FOR_BSB)
 
-	#define	CONFIG_BOOTARGS	"console=ttyS0,115200 root=31:02 rootfstype=squashfs init=/sbin/init mtdparts=ar7240-nor0:128k(u-boot),64k(u-boot-env),16128k(firmware),64k(ART)"
+//	We already have default boot arguments inside the OS image
+//	#define	CONFIG_BOOTARGS	""
 
 #elif defined(CONFIG_FOR_8DEVICES_CARAMBOLA2)
 

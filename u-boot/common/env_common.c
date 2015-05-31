@@ -209,6 +209,8 @@ void env_relocate(void){
 #endif
 		env_crc_update();
 		gd->env_valid = 1;
+
+		run_command("saveenv",0);
 	} else {
 		env_relocate_spec();
 	}
