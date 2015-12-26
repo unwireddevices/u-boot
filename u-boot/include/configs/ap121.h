@@ -57,7 +57,7 @@
 
 	#define	CONFIG_BOOTARGS	"console=ttyS0,115200 root=31:02 rootfstype=squashfs init=/sbin/init mtdparts=ar7240-nor0:128k(u-boot),1024k(kernel),2816k(rootfs),64k(config),64k(ART)"
 
-#elif defined(CONFIG_FOR_BSB)
+#elif defined(CONFIG_FOR_UNWONE)
 
 //	We already have default boot arguments inside the OS image
 //	#define	CONFIG_BOOTARGS	""
@@ -87,7 +87,7 @@
 #elif defined(CONFIG_FOR_8DEVICES_CARAMBOLA2)
 	#define	CFG_LOAD_ADDR			 0x9F050000
 	#define UPDATE_SCRIPT_FW_ADDR	"0x9F050000"
-#elif defined(CONFIG_FOR_BSB)
+#elif defined(CONFIG_FOR_UNWONE)
 	#define	CFG_LOAD_ADDR			 0x9F030000
 	#define UPDATE_SCRIPT_FW_ADDR	"0x9F030000"
 #elif defined(CONFIG_FOR_DRAGINO_V2)
@@ -102,7 +102,7 @@
 	#define CONFIG_BOOTCOMMAND "bootm 0x9F080000"
 #elif defined(CONFIG_FOR_8DEVICES_CARAMBOLA2)
 	#define CONFIG_BOOTCOMMAND "bootm 0x9F050000"
-#elif defined(CONFIG_FOR_BSB)
+#elif defined(CONFIG_FOR_UNWONE)
 	#define CONFIG_BOOTCOMMAND "bootm 0x9F030000"
 #elif defined(CONFIG_FOR_DRAGINO_V2)
 	#define CONFIG_BOOTCOMMAND "bootm 0x9F040000"
@@ -131,11 +131,11 @@
 	#define	CFG_PROMPT "dr_boot> "
 #endif
 
-#if defined(CONFIG_FOR_BSB)
+#if defined(CONFIG_FOR_UNWONE)
 	#if defined(CFG_PROMPT)
 		#undef CFG_PROMPT
 	#endif
-	#define	CFG_PROMPT "BSB> "
+	#define	CFG_PROMPT "UNW> "
 #endif
 
 #undef	CFG_HZ
@@ -774,7 +774,7 @@
  * Address and size of Primary Environment Sector
  */
 #if defined(CONFIG_FOR_8DEVICES_CARAMBOLA2) || \
-	defined(CONFIG_FOR_BSB) || \
+	defined(CONFIG_FOR_UNWONE) || \
 	defined(CONFIG_FOR_DRAGINO_V2)
 	#define	CFG_ENV_IS_IN_FLASH	1
 	#undef CFG_ENV_IS_NOWHERE
@@ -791,7 +791,7 @@
 	#define CFG_ENV_ADDR		0x9F040000
 	#define CFG_ENV_SIZE		0x8000
 	#define CFG_ENV_SECT_SIZE	0x10000
-#elif defined(CONFIG_FOR_BSB)
+#elif defined(CONFIG_FOR_UNWONE)
 	#define CFG_ENV_ADDR		0x9F020000
 	#define CFG_ENV_SIZE		0x8000
 	#define CFG_ENV_SECT_SIZE	0x10000
@@ -838,7 +838,7 @@
 							 CFG_CMD_ENV)
 
 
-#elif defined(CONFIG_FOR_BSB)
+#elif defined(CONFIG_FOR_UNWONE)
 
 #define CONFIG_CMD_USB
 #define CONFIG_USB_BOOT
@@ -867,8 +867,8 @@
 #define CFG_USB_BOOT_LOAD_ADDR 			0x80800000
 #define CFG_MAX_USB_BOOT_FILE_SIZE 		32*1024*1024 /* 32MB */
 #define CFG_MAX_USB_RECOVERY_FILE_SIZE 		0xFC0000 /* Firmware partiton */
-#define CFG_USB_BOOT_FILENAME 			"bsb_uboot.bin"
-#define CFG_USB_RECOVERY_FILENAME 		"bsb_recovery.bin"
+#define CFG_USB_BOOT_FILENAME 			"unwone_uboot.bin"
+#define CFG_USB_RECOVERY_FILENAME 		"unwone_recovery.bin"
 #define CFG_USB_RECOVERY_FW_START_IN_FLASH 	"0x9f030000"
 
 	#define CONFIG_COMMANDS (CFG_CMD_MEMORY | \
@@ -955,7 +955,7 @@
 #elif defined(CONFIG_FOR_DRAGINO_V2)
 	#define WEBFAILSAFE_UPLOAD_UBOOT_SIZE_IN_BYTES		(192 * 1024)
 	#define UPDATE_SCRIPT_UBOOT_SIZE_IN_BYTES			"0x30000"
-#elif defined(CONFIG_FOR_BSB)
+#elif defined(CONFIG_FOR_UNWONE)
 	#define WEBFAILSAFE_UPLOAD_UBOOT_SIZE_IN_BYTES		(128 * 1024)
 	#define UPDATE_SCRIPT_UBOOT_SIZE_IN_BYTES			"0x20000"
 #else
@@ -968,7 +968,7 @@
 	#define WEBFAILSAFE_UPLOAD_KERNEL_ADDRESS			WEBFAILSAFE_UPLOAD_UBOOT_ADDRESS + 0x80000
 #elif defined(CONFIG_FOR_8DEVICES_CARAMBOLA2)
 	#define WEBFAILSAFE_UPLOAD_KERNEL_ADDRESS			WEBFAILSAFE_UPLOAD_UBOOT_ADDRESS + 0x50000
-#elif defined(CONFIG_FOR_BSB)
+#elif defined(CONFIG_FOR_UNWONE)
 	#define WEBFAILSAFE_UPLOAD_KERNEL_ADDRESS			WEBFAILSAFE_UPLOAD_UBOOT_ADDRESS + 0x30000
 #elif defined(CONFIG_FOR_DRAGINO_V2)
 	#define WEBFAILSAFE_UPLOAD_KERNEL_ADDRESS			WEBFAILSAFE_UPLOAD_UBOOT_ADDRESS + 0x40000
@@ -990,8 +990,8 @@
 #elif defined(CONFIG_FOR_8DEVICES_CARAMBOLA2)
 	// Carambola 2: 256k(U-Boot),64k(U-Boot env),64k(ART)
 	#define WEBFAILSAFE_UPLOAD_LIMITED_AREA_IN_BYTES	(384 * 1024)
-#elif defined(CONFIG_FOR_BSB)
-	// Black Swift board: 128k(U-Boot),64k(U-Boot env),64k(ART)
+#elif defined(CONFIG_FOR_UNWONE)
+	// Unwired One: 128k(U-Boot),64k(U-Boot env),64k(ART)
 	#define WEBFAILSAFE_UPLOAD_LIMITED_AREA_IN_BYTES	(256 * 1024)
 #elif defined(CONFIG_FOR_DRAGINO_V2)
 	// Dragino 2: 192k(U-Boot),64k(U-Boot env),64k(ART)
@@ -1073,8 +1073,8 @@
 	#define OFFSET_MAC_DATA_BLOCK_LENGTH	0x010000
 	#define OFFSET_MAC_ADDRESS		0x000000
 	#define OFFSET_MAC_ADDRESS2		0x000006
-#elif defined(CONFIG_FOR_BSB)
-	// Black Swift board has one MAC address at the beginning of ART partition
+#elif defined(CONFIG_FOR_UNWONE)
+	// Unwired One board has one MAC address at the beginning of ART partition
 	#define OFFSET_MAC_DATA_BLOCK		0xFF0000
 	#define OFFSET_MAC_DATA_BLOCK_LENGTH	0x010000
 	#define OFFSET_MAC_ADDRESS		0x000000
@@ -1091,7 +1091,7 @@
 #endif
 
 #if !defined(CONFIG_FOR_8DEVICES_CARAMBOLA2) && \
-	!defined(CONFIG_FOR_BSB)     && \
+	!defined(CONFIG_FOR_UNWONE)     && \
 	!defined(CONFIG_FOR_DLINK_DIR505_A1)     && \
 	!defined(CONFIG_FOR_GS_OOLITE_V1_DEV)    && \
 	!defined(CONFIG_FOR_DRAGINO_V2)
@@ -1136,7 +1136,7 @@
 	#define PLL_IN_FLASH_DATA_BLOCK_LENGTH	0x00010000
 	#define PLL_IN_FLASH_MAGIC_OFFSET		0x0000FFF0	// last 16 bytes
 
-#elif defined(CONFIG_FOR_BSB)
+#elif defined(CONFIG_FOR_UNWONE)
 	/*
 	 * We will store PLL and CLOCK registers
 	 * configuration at the end of environment

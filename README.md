@@ -1,9 +1,9 @@
-U-Boot modification for Black Swift Board
+U-Boot-mod for Unwired One Board
 -------------------
 
-This is a modified U-Boot boot loader for Black Swift board (http://www.black-swift.com)
+This is a modified U-Boot boot loader for Unwired One board (http://www.unwireddevices.com)
 
-- Black Swift support (compile with *make bsb* command)
+- Unwired One support (compile with *make unwired-one* command)
 - Support for board firmware upgrade with USB flash drive: any specific partition (u-boot, u-boot-env, firmware, art) or the whole flash (16 MB)
 - Support for running U-Boot scripts from USB flash drive
 
@@ -14,17 +14,17 @@ Following source were used:
 
 To prepare USB flash drive:
 - Format USB drive into FAT or FAT32 filesystem
-- Place one of the following files on it in *_BSB* folder:
+- Place one of the following files on it in *_FW* folder:
 	- **autorun**: U-Boot console commands to execute
 	- **u-boot.bin**: u-boot partition image (U-Boot itself, 128KB).
 	- **u-boot-env.bin**: u-boot-env partition image (U-Boot environment variables, 64KB).
 	- **firmware.bin**: OpenWRT firmware partition image (size may vary).
 	- **art.bin**: ART partition image (64KB).
 	- **dump.bin**: whole flash (16MB).
-- Turn Black Swift off
+- Turn Unwired One off
 - Connect USB drive to its *Host* USB port
 - Press and hold *Reset* button
-- Turn Black Swift on
+- Turn Unwired One on
 - Wait for onboard LED to blink once and release *Reset* button
 
 Successful firmware update indicated by 5 blinks of onboard LED, failure — with 20 fast blinks.
@@ -37,8 +37,6 @@ Successful firmware update indicated by 5 blinks of onboard LED, failure — wi
 - **Mode 4**: 8...10 sec: start U-Boot netconsole
 
 Mode is indicated by onboard LED, e.g. if you need HTTP server, wait for 3 LED flashes in a row and release *Reset* button.
-
-(c) Dmitriy Zherebkov, dzh@black-swift.com
 
 U-Boot 1.1.4 modification for routers
 ==========

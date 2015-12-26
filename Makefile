@@ -2,7 +2,7 @@ export BUILD_TOPDIR=$(PWD)
 export STAGING_DIR=$(BUILD_TOPDIR)/tmp
 
 export MAKECMD=make ARCH=mips CROSS_COMPILE=mips-openwrt-linux-uclibc-
-export PATH:=/home/bsb/openwrt/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/bin/:$(PATH)
+export PATH:=/home/openwrt/openwrt/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/bin/:$(PATH)
 
 # boot delay (time to autostart boot command)
 export CONFIG_BOOTDELAY=1
@@ -159,13 +159,13 @@ gs-oolite_v1_dev:
 	@cp $(BUILD_TOPDIR)/u-boot/tuboot.bin $(BUILD_TOPDIR)/bin/temp.bin
 	@make show_size
 
-bsb:	export UBOOT_FILE_NAME=uboot_for_bsb
-bsb:	export MAX_UBOOT_SIZE=128
-bsb:	export COMPRESSED_UBOOT=1
-bsb:	export DEVICE_VENDOR=SE
-bsb:	export DISABLE_CONSOLE_OUTPUT=1
-bsb:
-	@cd $(BUILD_TOPDIR)/u-boot/ && $(MAKECMD) bsb_config
+unwired-one:	export UBOOT_FILE_NAME=uboot_for_unwired_one
+unwired-one:	export MAX_UBOOT_SIZE=128
+unwired-one:	export COMPRESSED_UBOOT=1
+unwired-one:	export DEVICE_VENDOR=SE
+unwired-one:	export DISABLE_CONSOLE_OUTPUT=1
+unwired-one:
+	@cd $(BUILD_TOPDIR)/u-boot/ && $(MAKECMD) unwone_config
 	@cd $(BUILD_TOPDIR)/u-boot/ && $(MAKECMD) ENDIANNESS=-EB V=1 all
 	@cp $(BUILD_TOPDIR)/u-boot/tuboot.bin $(BUILD_TOPDIR)/bin/temp.bin
 	@make show_size

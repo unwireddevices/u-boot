@@ -232,7 +232,7 @@ static void usb_upgrade(void)
 		}
 		else
 		{
-			if((filesize=load_file("_bsb/autorun",addr)) > 0)
+			if((filesize=load_file("_fw/autorun",addr)) > 0)
 			{
 				show_partition_error=was_show_error;
 
@@ -276,35 +276,35 @@ static void usb_upgrade(void)
 				//	try to upgrade some partition
 				int partition=-1;
 
-				filesize=load_file("_bsb/u-boot.bin",addr);
+				filesize=load_file("_fw/u-boot.bin",addr);
 				if(filesize == 0x20000)
 				{
 					partition=0;
 				}
 				else
 				{
-					filesize=load_file("_bsb/u-boot-env.bin",addr);
+					filesize=load_file("_fw/u-boot-env.bin",addr);
 					if(filesize == 0x10000)
 					{
 						partition=1;
 					}
 					else
 					{
-						filesize=load_file("_bsb/firmware.bin",addr);
+						filesize=load_file("_fw/firmware.bin",addr);
 						if(filesize > 0)
 						{
 							partition=2;
 						}
 						else
 						{
-							filesize=load_file("_bsb/art.bin",addr);
+							filesize=load_file("_fw/art.bin",addr);
 							if(filesize == 0x10000)
 							{
 								partition=3;
 							}
 							else
 							{
-								filesize=load_file("_bsb/dump.bin",addr);
+								filesize=load_file("_fw/dump.bin",addr);
 								if(filesize == 0x1000000)
 								{
 									partition=4;
