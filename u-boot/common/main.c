@@ -70,38 +70,43 @@ static __inline__ int abortboot(int bootdelay){
 	}
 #endif
 
-	if(bootdelay > 0){
+	if(getenv("silent") != NULL) {
+		printf("Silent mode enabled, ignoring keypresses");
+	}
+	else {
+		if(bootdelay > 0){
 #ifdef CONFIG_MENUPROMPT
-		printf(CONFIG_MENUPROMPT, bootdelay);
+			printf(CONFIG_MENUPROMPT, bootdelay);
 #else
-		printf("Hit any key to stop autoboot: %d ", bootdelay);
+			printf("Hit any key to stop autoboot: %d ", bootdelay);
 #endif
 
-		while((bootdelay > 0) && (!abort)){
-			int i;
+			while((bootdelay > 0) && (!abort)){
+				int i;
 
-			--bootdelay;
+				--bootdelay;
 
-			/* delay 100 * 10ms */
-			for(i = 0; !abort && i < 100; ++i){
+				/* delay 100 * 10ms */
+				for(i = 0; !abort && i < 100; ++i){
 
-				/* we got a key press	*/
-				if(tstc()){
-					/* don't auto boot	*/
-					abort = 1;
-					/* no more delay	*/
-					bootdelay = 0;
-					/* consume input	*/
-					(void) getc();
-					break;
+					/* we got a key press	*/
+					if(tstc()){
+						/* don't auto boot	*/
+						abort = 1;
+						/* no more delay	*/
+						bootdelay = 0;
+						/* consume input	*/
+						(void) getc();
+						break;
+					}
+					udelay(10000);
 				}
-				udelay(10000);
+
+				printf("\b\b%d ", bootdelay);
 			}
 
-			printf("\b\b%d ", bootdelay);
+			printf("\n\n");
 		}
-
-		printf("\n\n");
 	}
 
 #ifdef CONFIG_SILENT_CONSOLE
@@ -176,9 +181,66 @@ static int load_file(const char* path,unsigned long addr)
 
 /****************************************************************************/
 
+static int usb_flash_image(int partition, int filesize, unsigned long addr)
+{
+	if(partition >= 0)
+	{
+		char buffer[256];
+		unsigned long addr_in_flash=0;
+
+		switch(partition)
+		{
+			case 0:
+				addr_in_flash=CFG_FLASH_BASE;	//	U-Boot
+				printf("Update 'u-boot' partition...\n");
+				break;
+
+			case 1:
+				addr_in_flash=CFG_ENV_ADDR;	//	U-Boot env
+				printf("Update 'u-boot-env' partition...\n");
+				break;
+
+			case 2:
+				addr_in_flash=CFG_LOAD_ADDR;	//	firmware
+				printf("Update 'firmware' partition...\n");
+				break;
+
+			case 3:
+				addr_in_flash=CFG_FLASH_BASE+OFFSET_MAC_DATA_BLOCK;	//	ART
+				printf("Update 'art' partition...\n");
+				break;
+
+			case 4:
+				addr_in_flash=CFG_FLASH_BASE;	//	full memory dump, all partitions
+				printf("Update all partitions from binary dump...\n");
+				break;
+		}
+
+		sprintf(buffer,
+			"erase 0x%X +0x%X; cp.b 0x%X 0x%X 0x%X",
+			addr_in_flash,
+			filesize,
+			addr,
+			addr_in_flash,
+			filesize);
+
+		if(bsb_run(buffer))
+		{
+			blink_led(3,250);
+			printf("Partition successfully updated\n");
+			return 0;
+		}
+		else
+		{
+			blink_led(10,100);
+			printf("Partition update failed\n");
+			return -1;
+		}
+	}
+}
+
 static void usb_upgrade(void)
 {
-	int isOK=0;
 	int needReset=0;
 
 	if(bsb_run("usb reset"))
@@ -199,188 +261,168 @@ static void usb_upgrade(void)
 		else
 			addr = CONFIG_SYS_LOAD_ADDR;
 
-		if(load_file("bsb_mac.bin",addr) == 6)
-		{	
+		// executing autorun script
+		if((filesize=load_file("_fw/autorun",addr)) > 0)
+		{
 			show_partition_error=was_show_error;
 
-			//	update mac address and increment source
-			unsigned char *macByte=(unsigned char*)addr;
-			unsigned short *macLastWord=((unsigned short*)addr)+2;
-
-			sprintf(buffer,
-				"setmac %02X:%02X:%02X:%02X:%02X:%02X",
-				macByte[0],
-				macByte[1],
-				macByte[2],
-				macByte[3],
-				macByte[4],
-				macByte[5]);
-
-			bsb_run(buffer);
-
-			*macLastWord=(*macLastWord)+4;	//	increment for the next board
-
-			sprintf(buffer,
-				"fatwrite usb 0:1 0x%X bsb_mac.bin 6",
-				addr);
-
-			if(bsb_run(buffer))
+			printf("Autorun script is found.\n");
+			if(filesize < 0x10000)
 			{
-				isOK=1;
-				needReset=1;
-			}
-		}
-		else
-		{
-			if((filesize=load_file("_fw/autorun",addr)) > 0)
-			{
-				show_partition_error=was_show_error;
-
-				printf("Autorun script is found.\n");
-				if(filesize < 0x10000)
-				{
-					char script[0x10000];
-					char *pDst=script;
-					char *pSrc=(char*)addr;
-					char *pEnd=pSrc+filesize;
+				char script[0x10000];
+				char *pDst=script;
+				char *pSrc=(char*)addr;
+				char *pEnd=pSrc+filesize;
 
 					while(pSrc < pEnd)
+				{
+					char next=*pSrc++;
+					if(next == '\n')
 					{
-						char next=*pSrc++;
-						if(next == '\n')
-						{
-							*pDst++=';';
-						}
-						else if(next == '\r')
-						{
-						//	just skip it
-						}
-						else
-						{
-							*pDst++=next;
-						}
+						*pDst++=';';
 					}
-
-					*pDst=0;
-
-					bsb_run(script);
-					isOK=1;
-				}
-				else
-				{
-					printf("Error: autorun script is too big (0x10000 or more)!\n");
-				}
-			}
-			else
-			{
-				//	try to upgrade some partition
-				int partition=-1;
-
-				filesize=load_file("_fw/u-boot.bin",addr);
-				if(filesize == 0x20000)
-				{
-					partition=0;
-				}
-				else
-				{
-					filesize=load_file("_fw/u-boot-env.bin",addr);
-					if(filesize == 0x10000)
+					else if(next == '\r')
 					{
-						partition=1;
+					//	just skip it
 					}
 					else
 					{
-						filesize=load_file("_fw/firmware.bin",addr);
-						if(filesize > 0)
-						{
-							partition=2;
-						}
-						else
-						{
-							filesize=load_file("_fw/art.bin",addr);
-							if(filesize == 0x10000)
-							{
-								partition=3;
-							}
-							else
-							{
-								filesize=load_file("_fw/dump.bin",addr);
-								if(filesize == 0x1000000)
-								{
-									partition=4;
-								}
-							}
-						}
+						*pDst++=next;
 					}
 				}
 
+				*pDst=0;
+
+				bsb_run(script);
+				blink_led(3,250);
+			}
+			else
+			{
+				blink_led(10,100);
+				printf("Error: autorun script is too big (0x10000 or more)!\n");
+			}
+		}
+		else // if autorun script was executed, no reflashing will be done
+		{
+			// updating flash partitions
+			int partition=-1;
+
+			// whole flash dump, 16Mbytes
+			filesize=load_file("_fw/dump.bin",addr);
+			if(filesize == 0x1000000)
+			{
+				partition=4;
+				show_partition_error=was_show_error;
+				if(usb_flash_image(partition, filesize, addr) >= 0 )
+				{
+					needReset=1;
+				}
+			}
+		
+			filesize=load_file("_fw/u-boot.bin",addr);
+			if(filesize == 0x20000)
+			{
+				partition=0;
+				show_partition_error=was_show_error;
+				if(usb_flash_image(partition, filesize, addr) >= 0 )
+				{
+					needReset=1;
+				}
+			}
+			
+			filesize=load_file("_fw/u-boot-env.bin",addr);
+			if(filesize == 0x10000)
+			{
+				partition=1;
+				show_partition_error=was_show_error;
+				if(usb_flash_image(partition, filesize, addr) >= 0 )
+				{
+					needReset=1;
+				}
+			}
+			
+			filesize=load_file("_fw/firmware.bin",addr);
+			if(filesize > 0)
+			{
+				partition=2;
+				show_partition_error=was_show_error;
+				if(usb_flash_image(partition, filesize, addr) >= 0 )
+				{
+					needReset=1;
+				}
+			}
+			
+			filesize=load_file("_fw/openwrt-ar71xx-generic-unwone-squashfs-sysupgrade.bin",addr);
+			if(filesize > 0)
+			{
+				partition=2;
+				show_partition_error=was_show_error;
+				if(usb_flash_image(partition, filesize, addr) >= 0 )
+				{
+					needReset=1;
+				}
+			}
+			
+			filesize=load_file("_fw/art.bin",addr);
+			if(filesize == 0x10000)
+			{
+				partition=3;
+				show_partition_error=was_show_error;
+				if(usb_flash_image(partition, filesize, addr) >= 0 )
+				{
+					needReset=1;
+				}
+			}
+			
+			if(partition<0)
+			{
+				printf("No firmware files found.\n");
+			}
+			
+			// flashing MAC address
+			// mac.bin is a file containing 6 bytes of it
+			// mac.bin will be updated with the new address for the next board
+			if(load_file("mac.bin",addr) == 6)
+			{	
 				show_partition_error=was_show_error;
 
-				if(partition >= 0)
+				//	update mac address and increment source
+				unsigned char *macByte=(unsigned char*)addr;
+				unsigned short *macLastWord=((unsigned short*)addr)+2;
+
+				sprintf(buffer,
+					"setmac %02X:%02X:%02X:%02X:%02X:%02X",
+					macByte[0],
+					macByte[1],
+					macByte[2],
+					macByte[3],
+					macByte[4],
+					macByte[5]);
+
+				bsb_run(buffer);
+
+				*macLastWord=(*macLastWord)+4;	//	increment for the next board
+
+				sprintf(buffer,
+					"fatwrite usb 0:1 0x%X bsb_mac.bin 6",
+					addr);
+
+				if(bsb_run(buffer))
 				{
-					unsigned long addr_in_flash=0;
-
-					switch(partition)
-					{
-						case 0:
-							addr_in_flash=CFG_FLASH_BASE;	//	U-Boot
-							printf("Upgrading 'u-boot' partition...\n");
-							break;
-
-						case 1:
-							addr_in_flash=CFG_ENV_ADDR;	//	U-Boot env
-							printf("Upgrading 'u-boot-env' partition...\n");
-							break;
-
-						case 2:
-							addr_in_flash=CFG_LOAD_ADDR;	//	firmware
-							printf("Upgrading 'firmware' partition...\n");
-							break;
-
-						case 3:
-							addr_in_flash=CFG_FLASH_BASE+OFFSET_MAC_DATA_BLOCK;	//	ART
-							printf("Upgrading 'art' partition...\n");
-							break;
-
-						case 4:
-							addr_in_flash=CFG_FLASH_BASE;	//	all 16M of flash memory
-							printf("Upgrading all partitions from binary dump...\n");
-							break;
-					}
-
-					sprintf(buffer,
-						"erase 0x%X +0x%X; cp.b 0x%X 0x%X 0x%X",
-						addr_in_flash,
-						filesize,
-						addr,
-						addr_in_flash,
-						filesize);
-
-					if(bsb_run(buffer))
-					{
-						isOK=1;
-						needReset=1;
-					}
+					blink_led(3,250);
+					needReset=1;
 				}
 				else
 				{
-					printf("Nothing to do - no files found.\n");
+					blink_led(10,100);
 				}
 			}
 		}
 	}
 	else
 	{
+		blink_led(10,100);
 		printf("No USB storage found.\n");
-	}
-
-	if(isOK)
-	{
-		blink_led(5,250);
-	}
-	else
-	{
-		blink_led(20,100);
 	}
 
 	if(needReset)
