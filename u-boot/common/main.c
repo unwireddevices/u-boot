@@ -70,7 +70,7 @@ static __inline__ int abortboot(int bootdelay){
 	}
 #endif
 
-	if(bootdelay > 0){
+	if((bootdelay > 0) && (getenv("silent") == NULL)){
 #ifdef CONFIG_MENUPROMPT
 		printf(CONFIG_MENUPROMPT, bootdelay);
 #else
