@@ -14,11 +14,11 @@ Following source were used:
 
 To prepare USB flash drive:
 - Format USB drive into FAT or FAT32 filesystem
-- Place any of the following files on it in *_FW* folder:
+- Place one of the following files on it in *_FW* folder:
 	- **autorun**: U-Boot console commands to execute
-	- **u-boot.bin** or **uboot_for_unwired_one.bin**: u-boot partition image (U-Boot itself, 128KB).
+	- **u-boot.bin**: u-boot partition image (U-Boot itself, 128KB).
 	- **u-boot-env.bin**: u-boot-env partition image (U-Boot environment variables, 64KB).
-	- **firmware.bin** or **openwrt-ar71xx-generic-unwone-squashfs-sysupgrade.bin**: OpenWRT firmware partition image (size may vary).
+	- **firmware.bin**: OpenWRT firmware partition image (size may vary).
 	- **art.bin**: ART partition image (64KB).
 	- **dump.bin**: whole flash (16MB).
 - Turn Unwired One off
@@ -27,17 +27,16 @@ To prepare USB flash drive:
 - Turn Unwired One on
 - Wait for onboard LED to blink once and release *Reset* button
 
-Successful firmware update indicated by 3 blinks of onboard LED, failure — with 10 fast blinks.
+Successful firmware update indicated by 5 blinks of onboard LED, failure — with 20 fast blinks.
 
 *Reset* button may be used to access other special bootloader modes:
 - **Mode 0**: Press < 2 sec or > 10 sec: run OpenWRT with default memory and CPU clock settings
 - **Mode 1**: 2...4 sec: firmware upgrade with USB flash drive
 - **Mode 2**: 4...6 sec: enter U-Boot console
-- **Mode 4**: 6...8 sec: reset OpenWRT to factory settings
-- **Mode 5**: 8...10 sec: start U-Boot internal HTTP server
-- **Mode 6**: 10...12 sec: start U-Boot netconsole
+- **Mode 3**: 6...8 sec: start U-Boot internal HTTP server
+- **Mode 4**: 8...10 sec: start U-Boot netconsole
 
-Mode is indicated by onboard LED, e.g. if you need HTTP server, wait for 5 LED flashes and release *Reset* button.
+Mode is indicated by onboard LED, e.g. if you need HTTP server, wait for 3 LED flashes in a row and release *Reset* button.
 
 U-Boot 1.1.4 modification for routers
 ==========

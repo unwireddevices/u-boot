@@ -30,9 +30,6 @@
 #include <hush.h>
 #endif
 
-#include <common.h>
-#include <jffs2/jffs2.h>
-
 #ifdef CONFIG_SILENT_CONSOLE
 DECLARE_GLOBAL_DATA_PTR;
 #endif
@@ -178,48 +175,7 @@ static int load_file(const char* path,unsigned long addr)
 }
 
 /****************************************************************************/
-static void openwrt_factory_reset()
-{
-	struct jffs2_unknown_node *node;
-	
-	u32 i;
-	u32 crc;
-	printf("Searching for JFFS2 filesystem\n");
-	for (i = CFG_LOAD_ADDR; i < CFG_LOAD_ADDR + 0xFC0000; i++)
-	{
-		node = (struct jffs2_unknown_node *) i;
-		if (node->magic == JFFS2_MAGIC_BITMASK)
-		{
-			if (node->hdr_crc == 0xF060DC98)
-			{
-				crc = crc32_no_comp(0, (unsigned char *)node, sizeof(struct jffs2_unknown_node) - 4);
-				printf("JFFS2 Magic Bitmask with correct CRC at 0x%X\n", node);
-				printf("Replacing Magic Bitmask with 0xDEADCODE...\n");
-				static unsigned char eof_mark[4] = {0xde, 0xad, 0xc0, 0xde};
-				static unsigned char *pad = eof_mark;
-				char buffer[256];
-				sprintf(buffer,
-						"erase 0x%X +0x%X; cp.b 0x%X 0x%X 0x%X",
-						node, 4, pad, node, 4);
-				if(bsb_run(buffer))
-				{
-					blink_led(3,250);
-					printf("Done\n");
-				}
-				else
-				{
-					blink_led(10,100);
-					printf("Error writing to flash\n");
-				}
-				bsb_run("reset");
-			}
-		}
-	}
-	printf("JFFS2 not found.\n");
-	blink_led(10,100);
-}
 
-/****************************************************************************/
 static int usb_flash_image(int partition, int filesize, unsigned long addr)
 {
 	if(partition >= 0)
@@ -613,12 +569,10 @@ void main_loop(void){
 		printf("Press reset button for at least:\n"
 			"- %d sec. to run upgrade from USB flash\n"
 			"- %d sec. to run U-Boot console\n"
-			"- %d sec. to reset OpenWRT settings\n"
 			"- %d sec. to run HTTP server\n"
 			"- %d sec. to run netconsole\n\n",
 				CONFIG_DELAY_TO_AUTORUN_USB,
 				CONFIG_DELAY_TO_AUTORUN_CONSOLE,
-				CONFIG_DELAY_TO_FACTORY_RESET,
 				CONFIG_DELAY_TO_AUTORUN_HTTPD,
 				CONFIG_DELAY_TO_AUTORUN_NETCONSOLE);
 
@@ -638,22 +592,15 @@ void main_loop(void){
 			{
 				if(counter >= CONFIG_DELAY_TO_AUTORUN_CONSOLE)
 				{
-					if(counter >= CONFIG_DELAY_TO_FACTORY_RESET)
+					if(counter >= CONFIG_DELAY_TO_AUTORUN_HTTPD)
 					{
-						if(counter >= CONFIG_DELAY_TO_AUTORUN_HTTPD)
+						if(counter >= CONFIG_DELAY_TO_AUTORUN_NETCONSOLE)
 						{
-							if(counter >= CONFIG_DELAY_TO_AUTORUN_NETCONSOLE)
-							{
-								stage=4;
-							}
-							else
-							{
-								stage=3;
-							}
+							stage=4;
 						}
 						else
 						{
-							stage=5;
+							stage=3;
 						}
 					}
 					else
@@ -696,10 +643,6 @@ void main_loop(void){
 				printf("\n\nButton was pressed for %d sec...\nStarting U-Boot netconsole...\n\n", counter);
 				bootdelay = -1;
 				run_command("startnc", 0);
-			} else if(stage == 5){
-				printf("\n\nButton was pressed for %d sec...\nResetting OpenWRT to factory defaults...\n\n", counter);
-				bootdelay = -1;
-				openwrt_factory_reset();
 			} else {
 				printf("\n\n## Error: button wasn't pressed long enough!\nContinuing normal boot...\n\n");
 			}

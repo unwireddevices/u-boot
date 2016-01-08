@@ -285,12 +285,11 @@ endif
 
 	@echo "#define CONFIG_DELAY_TO_AUTORUN_USB          2" >> include/config.h
 	@echo "#define CONFIG_DELAY_TO_AUTORUN_CONSOLE      4" >> include/config.h
-	@echo "#define CONFIG_DELAY_TO_FACTORY_RESET        6" >> include/config.h
-	@echo "#define CONFIG_DELAY_TO_AUTORUN_HTTPD        8" >> include/config.h
-	@echo "#define CONFIG_DELAY_TO_AUTORUN_NETCONSOLE   10" >> include/config.h
+	@echo "#define CONFIG_DELAY_TO_AUTORUN_HTTPD        6" >> include/config.h
+	@echo "#define CONFIG_DELAY_TO_AUTORUN_NETCONSOLE   8" >> include/config.h
 
 	# max delay time for button pressing
-	@echo "#define CONFIG_MAX_BUTTON_PRESSING          12" >> include/config.h
+	@echo "#define CONFIG_MAX_BUTTON_PRESSING          10" >> include/config.h
 
 	# don't show info about console (in, out, err...)
 	@echo "#define CFG_CONSOLE_INFO_QUIET"                 >> include/config.h
