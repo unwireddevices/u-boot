@@ -325,6 +325,17 @@ static void usb_upgrade(void)
 				}
 			}
 			
+			filesize=load_file("_fw/uboot_for_unwired_one.bin",addr);
+			if(filesize == 0x20000)
+			{
+				partition=0;
+				show_partition_error=was_show_error;
+				if(usb_flash_image(partition, filesize, addr) >= 0 )
+				{
+					needReset=1;
+				}
+			}
+			
 			filesize=load_file("_fw/u-boot-env.bin",addr);
 			if(filesize == 0x10000)
 			{
