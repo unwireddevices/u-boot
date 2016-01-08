@@ -478,7 +478,7 @@ unwone_config : unconfig hornet_common_config
 	@echo "#define GPIO_RST_BUTTON_BIT                 11" >> include/config.h
 	@echo "#define GPIO_RST_BUTTON_IS_ACTIVE_LOW        1" >> include/config.h
 	@echo "#define DEFAULT_FLASH_SIZE_IN_MB            16" >> include/config.h
-	@echo "#define BOARD_CUSTOM_STRING                  \"U-Boot for Unwired One board (AR9331) r1.02\"" >> include/config.h
+	@echo "#define BOARD_CUSTOM_STRING                  \"U-Boot for Unwired One board (AR9331) r1.03\"" >> include/config.h
 	
 	@./mkconfig -a ap121 mips mips ap121 ar7240 ar7240
 
