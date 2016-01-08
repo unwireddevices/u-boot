@@ -33,11 +33,11 @@ Successful firmware update indicated by 3 blinks of onboard LED, failure — wit
 - **Mode 0**: Press < 2 sec or > 10 sec: run OpenWRT with default memory and CPU clock settings
 - **Mode 1**: 2...4 sec: firmware upgrade with USB flash drive
 - **Mode 2**: 4...6 sec: enter U-Boot console
-- **Mode 4**: 6...8 sec: reset OpenWRT to factory settings
-- **Mode 5**: 8...10 sec: start U-Boot internal HTTP server
-- **Mode 6**: 10...12 sec: start U-Boot netconsole
+- **Mode 3**: 6...8 sec: reset OpenWRT to factory settings
+- **Mode 4**: 8...10 sec: start U-Boot internal HTTP server
+- **Mode 5**: 10...12 sec: start U-Boot netconsole
 
-Mode is indicated by onboard LED, e.g. if you need HTTP server, wait for 5 LED flashes and release *Reset* button.
+Mode is indicated by onboard LED: LED blinks once when board is powered and then it blinks every 2 seconds. So if you need, for example, to reset OpenWRT settings — this is Mode 3, so wait for 1 short blinks right after power up, then count 3 blinks (each is a bit longer then the first one) and relese Reset button.
 
 U-Boot 1.1.4 modification for routers
 ==========

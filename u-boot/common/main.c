@@ -488,27 +488,16 @@ static void usb_upgrade(void)
 
 /****************************************************************************/
 
-static void blink_sys_led(int stage)
+static void blink_sys_led(int counter)
 {
 	all_led_off();
 
-	if(stage)
+	if((counter) && !(counter%2))
 	{
-		int d=100;
-		int count=stage;
-		int rest=1000-(stage*2*d);
-		int i=0;
-
-		for(; i < count; ++i)
-		{
-			all_led_on();
-			milisecdelay(d);
-
-			all_led_off();
-			milisecdelay(d);
-		}
-
-		milisecdelay(rest);
+		all_led_on();
+		milisecdelay(300);
+		all_led_off();
+		milisecdelay(700);
 	}
 	else
 	{
@@ -626,7 +615,7 @@ void main_loop(void){
 
 		while(reset_button_status()){
 
-			blink_sys_led(stage);	//	1 second!
+			blink_sys_led(counter);	//	1 second!
 
 			if(!reset_button_status()){
 				break;
@@ -644,16 +633,16 @@ void main_loop(void){
 						{
 							if(counter >= CONFIG_DELAY_TO_AUTORUN_NETCONSOLE)
 							{
-								stage=4;
+								stage=5;
 							}
 							else
 							{
-								stage=3;
+								stage=4;
 							}
 						}
 						else
 						{
-							stage=5;
+							stage=3;
 						}
 					}
 					else
@@ -689,17 +678,17 @@ void main_loop(void){
 				printf("\n\nButton was pressed for %d sec...\nStarting U-Boot console...\n\n", counter);
 				bootdelay = -1;
 			} else if(stage == 3){
-				printf("\n\nButton was pressed for %d sec...\nHTTP server is starting for firmware update...\n\n", counter);
-				NetLoopHttpd();
-				bootdelay = -1;
-			} else if(stage == 4){
-				printf("\n\nButton was pressed for %d sec...\nStarting U-Boot netconsole...\n\n", counter);
-				bootdelay = -1;
-				run_command("startnc", 0);
-			} else if(stage == 5){
 				printf("\n\nButton was pressed for %d sec...\nResetting OpenWRT to factory defaults...\n\n", counter);
 				bootdelay = -1;
 				openwrt_factory_reset();
+			} else if(stage == 4){
+				printf("\n\nButton was pressed for %d sec...\nHTTP server is starting for firmware update...\n\n", counter);
+				NetLoopHttpd();
+				bootdelay = -1;
+			} else if(stage == 5){
+				printf("\n\nButton was pressed for %d sec...\nStarting U-Boot netconsole...\n\n", counter);
+				bootdelay = -1;
+				run_command("startnc", 0);
 			} else {
 				printf("\n\n## Error: button wasn't pressed long enough!\nContinuing normal boot...\n\n");
 			}
