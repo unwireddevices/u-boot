@@ -437,6 +437,7 @@ static void usb_upgrade(void)
 			if(partition<0)
 			{
 				printf("No firmware files found.\n");
+				blink_led(10,100);
 				needReset = 1;
 			}
 			
