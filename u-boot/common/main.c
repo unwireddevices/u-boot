@@ -142,7 +142,7 @@ static void blink_led(int count,int delay)
 
 /****************************************************************************/
 
-static int bsb_run(const char* command)
+static int cmd_exec(const char* command)
 {
 debug("Run \"%s\":\n",command);
 
@@ -165,7 +165,7 @@ static int load_file(const char* path,unsigned long addr)
 		addr,
 		path);
 
-	if(bsb_run(buffer))
+	if(cmd_exec(buffer))
 	{
 		filesize_str = getenv("filesize");
 		if (filesize_str != NULL)
@@ -201,7 +201,7 @@ static void openwrt_factory_reset()
 				sprintf(buffer,
 						"erase 0x%X +0x%X; cp.b 0x%X 0x%X 0x%X",
 						node, 4, pad, node, 4);
-				if(bsb_run(buffer))
+				if(cmd_exec(buffer))
 				{
 					blink_led(3,250);
 					printf("Done\n");
@@ -211,7 +211,7 @@ static void openwrt_factory_reset()
 					blink_led(10,100);
 					printf("Error writing to flash\n");
 				}
-				bsb_run("reset");
+				cmd_exec("reset");
 			}
 		}
 	}
@@ -263,7 +263,7 @@ static int usb_flash_image(int partition, int filesize, unsigned long addr)
 			addr_in_flash,
 			filesize);
 
-		if(bsb_run(buffer))
+		if(cmd_exec(buffer))
 		{
 			blink_led(3,250);
 			printf("Partition successfully updated\n");
@@ -281,9 +281,19 @@ static int usb_flash_image(int partition, int filesize, unsigned long addr)
 static void usb_upgrade(void)
 {
 	int needReset=0;
-
-	if(bsb_run("usb reset"))
+	
+	if(cmd_exec("usb reset"))
 	{
+		while(usb_stor_info())
+		{
+			printf("USB storage not found, trying...\n");
+			all_led_on();
+			milisecdelay(1000);
+			all_led_off();
+			cmd_exec("usb reset");
+		}
+		printf("USB storage has been found\n");
+		
 		char buffer[256];
 
 		const char *addr_str;
@@ -332,7 +342,7 @@ static void usb_upgrade(void)
 
 				*pDst=0;
 
-				bsb_run(script);
+				cmd_exec(script);
 				blink_led(3,250);
 			}
 			else
@@ -427,6 +437,7 @@ static void usb_upgrade(void)
 			if(partition<0)
 			{
 				printf("No firmware files found.\n");
+				needReset = 1;
 			}
 			
 			// flashing MAC address
@@ -449,7 +460,7 @@ static void usb_upgrade(void)
 					macByte[4],
 					macByte[5]);
 
-				bsb_run(buffer);
+				cmd_exec(buffer);
 
 				*macLastWord=(*macLastWord)+4;	//	increment for the next board
 
@@ -457,7 +468,7 @@ static void usb_upgrade(void)
 					"fatwrite usb 0:1 0x%X bsb_mac.bin 6",
 					addr);
 
-				if(bsb_run(buffer))
+				if(cmd_exec(buffer))
 				{
 					blink_led(3,250);
 					needReset=1;
@@ -472,12 +483,13 @@ static void usb_upgrade(void)
 	else
 	{
 		blink_led(10,100);
-		printf("No USB storage found.\n");
+		printf("Error resetting USB host.\n");
+		needReset = 1;
 	}
 
 	if(needReset)
 	{
-		bsb_run("reset");
+		cmd_exec("reset");
 	}
 	else
 	{
@@ -524,9 +536,9 @@ static void try_runonce(int stage)
 		strcpy(cmd_run,command);
 
 		sprintf(cmd_erase,"setenv %s; saveenv; printenv",var);
-		bsb_run(cmd_erase);
+		cmd_exec(cmd_erase);
 
-		bsb_run(cmd_run);
+		cmd_exec(cmd_run);
 	}
 }
 
@@ -538,7 +550,7 @@ static void try_autorun()
 
 	if(command)
 	{
-		bsb_run(command);
+		cmd_exec(command);
 	}
 }
 
