@@ -466,7 +466,7 @@ static void usb_upgrade(void)
 				*macLastWord=(*macLastWord)+4;	//	increment for the next board
 
 				sprintf(buffer,
-					"fatwrite usb 0:1 0x%X bsb_mac.bin 6",
+					"fatwrite usb 0:1 0x%X mac.bin 6",
 					addr);
 
 				if(cmd_exec(buffer))
