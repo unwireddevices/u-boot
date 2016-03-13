@@ -210,3 +210,8 @@ clean_all:	clean
 	@echo Removing all binary images
 	@rm -f $(BUILD_TOPDIR)/bin/*.bin
 	@rm -f $(BUILD_TOPDIR)/bin/*.md5
+
+prepare:
+	@chmod 755 host_util/lzma
+	@chmod 755 u-boot/mkconfig
+	@chmod 755 u-boot/httpd/vendors/makefsdatac
