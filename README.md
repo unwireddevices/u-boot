@@ -37,7 +37,7 @@ Successful firmware update indicated by 3 blinks of onboard LED, failure — wit
 - **Mode 4**: 8...10 sec: start U-Boot internal HTTP server
 - **Mode 5**: 10...12 sec: start U-Boot netconsole
 
-Mode is indicated by onboard LED: LED blinks once when board is powered and then it blinks every 2 seconds. So if you need, for example, to reset OpenWRT settings — this is Mode 3, so press the button, power the board, count 3 blinks and relese Reset button.
+Mode is indicated by onboard LED: LED blinks every 2 seconds. So if you need, for example, to reset OpenWRT settings — this is Mode 3, so press the button, power the board, count 3 blinks and relese Reset button.
 
 Changelog
 ==========
