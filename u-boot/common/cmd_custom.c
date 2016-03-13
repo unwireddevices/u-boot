@@ -1,4 +1,8 @@
 /*
+ * (C) Copyright 2016
+ * Unwired Devices LLC, info@unwds.com
+ * www.unwireddevices.com
+ *
  * (C) Copyright 2013
  * Piotr Dymacz (pepe2k), Real Time Systems, piotr@realtimesystems.pl, pepe2k@gmail.com
  * Custom commands for U-Boot 1.1.4 modification.
@@ -711,3 +715,10 @@ int do_clear_clocks(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]){
 
 U_BOOT_CMD(clearclk, 1, 0, do_clear_clocks, "remove PLL and clocks configuration from FLASH\n", NULL);
 #endif /* #if defined(PLL_IN_FLASH_MAGIC_OFFSET) */
+
+int do_usb_upgrade(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[]){
+	usb_upgrade(0);
+	return(0);
+}
+
+U_BOOT_CMD(usbupgrade, 1, 0, do_usb_upgrade, "upgrade frimware from USB flash drive\n", NULL);

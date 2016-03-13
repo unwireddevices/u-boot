@@ -675,4 +675,6 @@ static inline phys_addr_t map_to_sysmem(void *ptr)
 }
 # endif
 
+void usb_upgrade(int wait_for_usb_storage);
+
 #endif	/* __COMMON_H_ */

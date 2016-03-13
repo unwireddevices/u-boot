@@ -1,4 +1,8 @@
 /*
+ * (C) Copyright 2016
+ * Unwired Devices LLC, info@unwds.com
+ * www.unwireddevices.com
+ * 
  * (C) Copyright 2000
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
  *
@@ -25,12 +29,12 @@
 
 #include <common.h>
 #include <command.h>
+#include <version.h>
 
 #ifdef CFG_HUSH_PARSER
 #include <hush.h>
 #endif
 
-#include <common.h>
 #include <jffs2/jffs2.h>
 
 #ifdef CONFIG_SILENT_CONSOLE
@@ -278,7 +282,7 @@ static int usb_flash_image(int partition, int filesize, unsigned long addr)
 	}
 }
 
-static void usb_upgrade(void)
+void usb_upgrade(int wait_for_usb_storage)
 {
 	int needReset=0;
 	
@@ -286,6 +290,11 @@ static void usb_upgrade(void)
 	{
 		while(usb_stor_info())
 		{
+			if (wait_for_usb_storage == 0)
+			{
+				printf("USB storage not found.");
+				return;
+			}
 			printf("USB storage not found, trying...\n");
 			all_led_on();
 			milisecdelay(1000);
@@ -588,6 +597,13 @@ void main_loop(void){
 #error "CONFIG_BOOTCOMMAND not defined!"
 #endif
 
+	if (strcmp(getenv("version"), U_BOOT_VERSION) != 0)
+	{
+		printf("Setting version variable = %s\n", U_BOOT_VERSION);
+		setenv("version", U_BOOT_VERSION);
+		saveenv();
+	}
+
 	if(!s){
 		setenv("bootcmd", CONFIG_BOOTCOMMAND);
 	}
@@ -686,7 +702,7 @@ void main_loop(void){
 			if(stage == 1){
 				printf("\n\nButton was pressed for %d sec...\nStarting upgrage from USB flash...\n\n", counter);
 				bootdelay = -1;
-				usb_upgrade();
+				usb_upgrade(1);
 			} else if(stage == 2){
 				printf("\n\nButton was pressed for %d sec...\nStarting U-Boot console...\n\n", counter);
 				bootdelay = -1;
@@ -712,6 +728,13 @@ void main_loop(void){
 
 	}
 
+	if (getenv("usbupgrade") != NULL)
+	{
+		bootdelay = -1;
+		run_command("setenv usbupgrade; saveenv", 0); // remove variable
+		usb_upgrade(1);
+	}
+	
 	if(bootdelay >= 0 && s && !abortboot(bootdelay)){
 
 		try_runonce(1);

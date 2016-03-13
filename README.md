@@ -39,6 +39,21 @@ Successful firmware update indicated by 3 blinks of onboard LED, failure — wit
 
 Mode is indicated by onboard LED: LED blinks once when board is powered and then it blinks every 2 seconds. So if you need, for example, to reset OpenWRT settings — this is Mode 3, so press the button, power the board, count 3 blinks and relese Reset button.
 
+Changelog
+==========
+
+Release 1.05 (March 13, 2016)
+- *usbupgrade* shell command (flashes firmware files from attached USB drive)
+- *usbupgrade* environment variable (set to any non-zero value to upgrade firmware from USB drive on the next boot)
+- *version* environemnt variable to check U-Boot version within OpenWRT
+- release version (1.05) is now included in U-Boot version string
+- if you get *make[1]: execvp: ./mkconfig: Permission denied* error, run *make prepare* to fix file permissions
+
+Release 1.04.1
+- support for updating multiple partitions from USB drive at once
+- when updating from USB drive, board will continuously try to initialize the drive if it is not plugged or too slow
+- support for resetting OpenWRT settings to factory defaults (hold *Reset* button for 6 seconds when the board is powered on)
+
 U-Boot 1.1.4 modification for routers
 ==========
 
